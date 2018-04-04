@@ -25,13 +25,16 @@ React, import the module using import*
 
 class MyArray {
 
+  // ** using an underscore is a naming convention for private functions. it tells dev's to not directly access this variable/method. instead, use this variable/method inside another method that you can directly access.
+
+
   constructor() {
     this.length = 2; 
     // the length of the array
     // whenever the class is first instantiated it's an empty array, so this.length would normally start at 0
     // for this purpose though, I have an array of 2 items so this.length = 2
 
-    this.capacity = 2;
+    this._capacity = 2;
     // at this point, I've only set aside (allocated) 2 boxes for the array 
     // if it gets any longer, I'll have to go to a new spot where I have more consecutive boxes available using _resize.
 
@@ -48,15 +51,15 @@ class MyArray {
 
   push(value) { // add a value to the next available box in my array ... ('gamma')
 
-    if (this.length >= this._capacity) {
-      // for the pretend array this.length = 2 && this.capacity = 2 so we will get inside of this statement when we try to add a 3rd value
+    if (this.length >= this.__) {
+      // for the pretend array this.length = 2 && this._capacity = 2 so we will get inside of this statement when we try to add a 3rd value
 
       this._resize((this.length + 1) * MyArray.SIZE_RATIO);
       // this._resize(3 * 3) => this._resize(9)
 
       /* after we run _resize we have new constructor values: 
       this.length is still 2
-      this.capacity = 9
+      this._capacity = 9
       this.pointer = 2
       */
     }
@@ -77,7 +80,6 @@ class MyArray {
   ============================= */
 
   // if we want to add another value to our array but we don't have any more free boxes in our array, we must copy our old array and move it to another memory address where there are enough boxes side by side to hold all of the values of the array.
-  // ** using the underscore is a naming convention for private functions. it tells dev's to not directly access this function (array._resize). instead, use this function inside another method that you can directly access.
   _resize(size) { // size = the amount of boxes we need, according to the push method, that's 9
     const previousPointer = this.pointer; 
     // gets the current memory address of the first box in our array (0)
@@ -108,7 +110,7 @@ class MyArray {
     // JS treats resizing as cut + paste; the values only exist in the new memory boxes
     // other languages treat resizing as copy + paste; the values exist in both sets of boxes
 
-    this.capacity = size;
+    this._capacity = size;
     // change the value in the constructor to 9
     // I now have 3 values in my array. I can add 5 more before having to resize again.
   }
@@ -149,14 +151,83 @@ class MyArray {
 
 
 
+  /* =============================
+  POP
+  ============================= */
+
   pop() {
+    if (this.length === 0) {
+      // if the array is empty, there's nothing to remove
+      throw new Error('Index error');
+    }
 
+    const value = memory.get(this.pointer + this.length - 1);
+    /* memory.get(2 + 3 - 1) => 
+        memory.get(4) =>
+          this.memory[4] = 'gamma'
+     */
+
+    this.length--;
+    // this.length = 2
+
+    return value;
+    // value = 'gamma'
   }
 
 
-  insert() {
+  /* =============================
+  * UPDATED PRETEND MEMORY AFTER POP
+    value:    | # | # | [alpha | beta] | ... | ... | ... | ... | ... | ... | ... | #  |
+    address:    0   1      2      3       4     5     6     7     8     9     10   11
 
+    - addresses 0-1 && 11 are still free
+    - addresses 2-3 are filled with array values
+    - addresses 4-10 are boxes that have been allocated for my array, but are empty
+
+  ============================= */
+
+
+  insert(index, value) { // index = 1, value = 'delta'
+    if (index < 0 || index >= this.length) {
+      // arrays don't have negative indexes so you'll get this error if you try
+      // likewise, if the index is equal to or greater than the length of the array, you'll get this error
+      throw new Error('Invalid index');
+    }
+
+    if (this.length >= this._capacity) {
+      // if the length of the array equals or exceeds the amount of boxes I've set aside for it, we need to resize again
+      this._resize((this.length + 1) * Array.SIZE_RATIO);
+    }
+
+    memory.copy(this.pointer + index + 1, this.pointer + index, this.length - index);
+    /* memory.copy( (2+1+1), (2+1), (2-1) )
+        memory.copy(4, 3, 1)
+          this.set(4, this.get(3))
+            this.set(4, beta)
+              this.memory[4] = beta
+     */
+
+    memory.set(this.pointer + index, value);
+    /* memory.set( (2+1), delta)
+        memory.set(3, delta)
+              this.memory[3] = delta
+     */
+
+    this.length++;
+    // this.length = 3
   }
+
+  
+  /* =============================
+  * UPDATED PRETEND MEMORY AFTER INSERT
+    value:    | # | # | [alpha | delta | beta] | ... | ... | ... | ... | ... | ... | #  |
+    address:    0   1      2      3       4     5     6     7     8     9     10   11
+
+    - addresses 0-1 && 11 are still free
+    - addresses 2-4 are filled with array values
+    - addresses 5-10 are boxes that have been allocated for my array, but are empty
+
+  ============================= */
 
 
   remove() {
