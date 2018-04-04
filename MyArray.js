@@ -16,8 +16,7 @@ React, import the module using import*
   value:    |[alpha | beta]| # | # | # | # | # | # |
   address:      0      1     2   3   4   5   6   7
 
-  - memory has a max of 8 boxes
-  - addresses 0-1 are my array
+  - addresses 0-1 are filled with array values
   - addresses 2-7 are free spaces
 
  */
@@ -41,11 +40,6 @@ class MyArray {
     // for my pretend memory, this.pointer = 0
   }
 
-  
-
-  get() {
-    console.log(this.pointer);
-  }
 
 
   /* =============================
@@ -76,6 +70,7 @@ class MyArray {
     // this.length = 3
   }
   
+
 
   /* =============================
   _RESIZE
@@ -116,8 +111,42 @@ class MyArray {
     this.capacity = size;
     // change the value in the constructor to 9
     // I now have 3 values in my array. I can add 5 more before having to resize again.
-
   }
+
+
+
+  /* =============================
+  * UPDATED PRETEND MEMORY AFTER PUSH && RESIZE
+    value:    | # | # | [alpha | beta | gamma] | ... | ... | ... | ... | ... | ... | #  |
+    address:    0   1      2      3       4      5      6     7     8     9     10   11
+
+    - addresses 0-1 && 11 are now free
+    - addresses 2-4 are filled with array values
+    - addresses 5-10 are boxes that have been allocated for my array, but are empty
+
+  ============================= */
+
+
+
+  /* =============================
+  GET
+  ============================= */
+
+  get(index) { // we want the value at index 2
+    if (index < 0 || index >= this.length) {
+      // arrays don't have negative indexes so you'll get this error if you try
+      // likewise, if the index is equal to or greater than the length of the array, you'll get this error
+      throw new Error('Invalid index');
+    }
+
+    return memory.get(this.pointer + index);
+    // if you search for a valid array index (in this case 0, 1 or 2) memory will go to this.pointer (which is array[0]) && add the index you're searching for
+    /* memory.get(2 + 2) => 
+        memory.get(4) =>
+          this.memory[4] = 'gamma'
+     */
+  }
+
 
 
   pop() {
