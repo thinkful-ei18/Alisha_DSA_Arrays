@@ -47,14 +47,25 @@ class MyArray {
     console.log(this.pointer);
   }
 
+
+  /* =============================
+  PUSH
+  ============================= */
+
   push(value) { // add a value to the next available box in my array ... ('gamma')
-    this._resize(this.length + 1);
-    // we need to place a 3rd value in our array
-    /* after we run _resize we have new constructor values: 
-        this.length is still 2
-        this.capacity = 3
-        this.pointer = 2
-    */
+
+    if (this.length >= this._capacity) {
+      // for the pretend array this.length = 2 && this.capacity = 2 so we will get inside of this statement when we try to add a 3rd value
+
+      this._resize((this.length + 1) * MyArray.SIZE_RATIO);
+      // this._resize(3 * 3) => this._resize(9)
+
+      /* after we run _resize we have new constructor values: 
+      this.length is still 2
+      this.capacity = 9
+      this.pointer = 2
+      */
+    }
 
     memory.set(this.ptr + this.length, value);
     /* memory.set(4, gamma) =>
@@ -64,16 +75,20 @@ class MyArray {
     this.length++;
     // this.length = 3
   }
+  
 
+  /* =============================
+  _RESIZE
+  ============================= */
 
   // if we want to add another value to our array but we don't have any more free boxes in our array, we must copy our old array and move it to another memory address where there are enough boxes side by side to hold all of the values of the array.
   // ** using the underscore is a naming convention for private functions. it tells dev's to not directly access this function (array._resize). instead, use this function inside another method that you can directly access.
-  _resize(size) { // size = the amount of boxes we need, according to the push method, that's 3
+  _resize(size) { // size = the amount of boxes we need, according to the push method, that's 9
     const previousPointer = this.pointer; 
-    // gets the current memory address of the first box in our array
+    // gets the current memory address of the first box in our array (0)
 
     this.pointer = memory.allocate(size);  
-    // reassigns the value of this.pointer to be the result of memory.allocate(3) 
+    // reassigns the value of this.pointer to be the result of memory.allocate(9) 
     // i.e. the memory address of the first box in the next set of (at least) 3 available consecutive boxes
     // this.pointer = 2
 
@@ -99,7 +114,8 @@ class MyArray {
     // other languages treat resizing as copy + paste; the values exist in both sets of boxes
 
     this.capacity = size;
-    // change the value in the constructor to 3
+    // change the value in the constructor to 9
+    // I now have 3 values in my array. I can add 5 more before having to resize again.
 
   }
 
@@ -119,6 +135,10 @@ class MyArray {
   }
 
 }
+
+MyArray.SIZE_RATIO = 3;
+// the size ratio is how many times the capacity is going to be increased by once the current capacity is met
+// this is useful so that we don't have to resize every time we push
 
 module.exports = MyArray;
 
