@@ -51,7 +51,7 @@ class MyArray {
 
   push(value) { // add a value to the next available box in my array ... ('gamma')
 
-    if (this.length >= this.__) {
+    if (this.length >= this._capacity) {
       // for the pretend array this.length = 2 && this._capacity = 2 so we will get inside of this statement when we try to add a 3rd value
 
       this._resize((this.length + 1) * MyArray.SIZE_RATIO);
