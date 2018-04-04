@@ -47,16 +47,28 @@ class MyArray {
     console.log(this.pointer);
   }
 
+  push(value) { // add a value to the next available box in my array ... ('gamma')
+    this._resize(this.length + 1);
+    // we need to place a 3rd value in our array
+    /* after we run _resize we have new constructor values: 
+        this.length is still 2
+        this.capacity = 3
+        this.pointer = 2
+    */
 
-  push() {
+    memory.set(this.ptr + this.length, value);
+    /* memory.set(4, gamma) =>
+        this.memory[4] = gamma
+    */
 
+    this.length++;
+    // this.length = 3
   }
-
 
 
   // if we want to add another value to our array but we don't have any more free boxes in our array, we must copy our old array and move it to another memory address where there are enough boxes side by side to hold all of the values of the array.
   // ** using the underscore is a naming convention for private functions. it tells dev's to not directly access this function (array._resize). instead, use this function inside another method that you can directly access.
-  _resize(size) { // size = the amount of boxes we need, let's say that's 3
+  _resize(size) { // size = the amount of boxes we need, according to the push method, that's 3
     const previousPointer = this.pointer; 
     // gets the current memory address of the first box in our array
 
@@ -77,7 +89,7 @@ class MyArray {
             this.memory[3] = beta
     */
     // the copy method determines what memory address the last item in the array needs to have
-    // in this case, array[0] (aka this.pointer) = memory address 2 
+    // in this case, array[0] (aka this.pointer) = memory address 2
     // array[1] = memory address 3
     // i now have space for array[2] at memory address 4
 
