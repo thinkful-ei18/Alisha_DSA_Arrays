@@ -187,6 +187,10 @@ class MyArray {
   ============================= */
 
 
+  /* =============================
+  INSERT
+  ============================= */
+
   insert(index, value) { // index = 1, value = 'delta'
     if (index < 0 || index >= this.length) {
       // arrays don't have negative indexes so you'll get this error if you try
@@ -217,11 +221,11 @@ class MyArray {
     // this.length = 3
   }
 
-  
+
   /* =============================
   * UPDATED PRETEND MEMORY AFTER INSERT
     value:    | # | # | [alpha | delta | beta] | ... | ... | ... | ... | ... | ... | #  |
-    address:    0   1      2      3       4     5     6     7     8     9     10   11
+    address:    0   1      2      3       4       5     6     7     8     9     10   11
 
     - addresses 0-1 && 11 are still free
     - addresses 2-4 are filled with array values
@@ -230,9 +234,40 @@ class MyArray {
   ============================= */
 
 
-  remove() {
+  /* =============================
+  REMOVE
+  ============================= */
 
+  remove(index) { // index = 0
+    if (index < 0 || index >= this.length) {
+      // arrays don't have negative indexes so you'll get this error if you try
+      // likewise, if the index is equal to or greater than the length of the array, you'll get this error
+      throw new Error('Invalid index');
+    }
+
+    memory.copy(this.pointer + index, this.pointer + index + 1, this.length - index - 1);
+    /* memory.copy( (2+0), (2+0+1), (3-2-1) )
+        memory.copy(2, 3, 0)
+          this.set(2, this.get(3))
+            this.set(2, delta)
+              this.memory[2] = delta
+     */
+
+    this.length--;
+    // this.length = 2
   }
+
+
+  /* =============================
+  * UPDATED PRETEND MEMORY AFTER REMOVE
+    value:    | # | # | [delta | beta] | ... | ... | ... | ... | ... | ... | ... | #  |
+    address:    0   1      2      3       4     5     6     7     8     9     10   11
+
+    - addresses 0-1 && 11 are still free
+    - addresses 2-3 are filled with array values
+    - addresses 4-10 are boxes that have been allocated for my array, but are empty
+
+  ============================= */
 
 }
 
